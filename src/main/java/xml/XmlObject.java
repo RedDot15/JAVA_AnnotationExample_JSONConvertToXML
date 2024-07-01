@@ -6,6 +6,6 @@ import java.lang.annotation.*;
 @Target({ ElementType.FIELD })
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-public @interface XmlObjectElement {
+public @interface XmlObject {
     String name();
 }

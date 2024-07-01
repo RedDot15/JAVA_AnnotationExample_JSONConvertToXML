@@ -1,8 +1,8 @@
 package helper;
 
 import xml.XmlElement;
-import xml.XmlElementWrapper;
-import xml.XmlObjectElement;
+import xml.XmlObjectWrapper;
+import xml.XmlObject;
 import xml.XmlRootElement;
 
 import java.lang.annotation.Annotation;
@@ -19,14 +19,19 @@ public class ObjectToXmlHelper {
     public static <T> String convertToXml(T obj) {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
-        sb.append(convertToXml(obj, 0));
+        if (obj instanceof Collection) {
+            sb.append(createXmlObjectWrapper(null,obj,0));
+        }
+        else{
+            sb.append(createXmlObject(obj, 0));
+        }
         return sb.toString();
     }
 
     /*
      * Chuyển đối tượng sang chuỗi xml
      */
-    private static <T> String convertToXml(T obj, int numOfTab) {
+    private static <T> String createXmlObject(T obj, int numOfTab) {
         StringBuilder sb = new StringBuilder();
 
         // Get Class of obj
@@ -51,41 +56,55 @@ public class ObjectToXmlHelper {
                 // Create xml elements
                 for (Field field : fields) {
                     field.setAccessible(true);
-                    if (field.isAnnotationPresent(XmlElementWrapper.class)) {
-                        sb.append(createXmlWrapper(field, obj, numOfTab + 1));
+                    if (field.isAnnotationPresent(XmlObjectWrapper.class)) {
+                        sb.append(createXmlObjectWrapper(field, obj, numOfTab + 1));
                     } else if (field.isAnnotationPresent(XmlElement.class)) {
                         sb.append(createXmlElement(field, obj, numOfTab + 1));
-                    } else if (field.isAnnotationPresent(XmlObjectElement.class)){
-                        sb.append(convertToXml(getValueOfFieldAsObject(field,obj) , numOfTab + 1));
+                    } else if (field.isAnnotationPresent(XmlObject.class)){
+                        sb.append(createXmlObject(getValueOfFieldAsObject(field,obj) , numOfTab + 1));
                     }
                 }
             }
 
             sb.append(getTab(numOfTab));
-            sb.append("</" + rootNode.name() + ">\n"); // End root element
+            sb.append("</" + rootNode.name() + ">"); // End root element
         }
 
         return sb.toString();
     }
 
-    public static String createXmlWrapper(Field field, Object obj, int numOfTab) {
+    public static String createXmlObjectWrapper(Field field, Object obj, int numOfTab) {
         StringBuilder sb = new StringBuilder();
-        XmlElementWrapper ann = field.getAnnotation(XmlElementWrapper.class);
-        String name = ann.name(); // Get Element's name
-        sb.append(getTab(numOfTab)); // Create 1 tab
-        sb.append("<" + name + ">"); // Start Element
-        sb.append("\n"); // Add new line
-        Collection<?> collections = getListValueOfField(field, obj);
-        if (collections != null && !collections.isEmpty()) {
-            // Create xml sub elements
-            for (Object collection : collections) {
-                sb.append(convertToXml(collection, numOfTab + 1)); // Increase tab
-                sb.append("\n"); // Add new line
+        Collection<?> collections;
+        if(field != null){
+            XmlObjectWrapper ann = field.getAnnotation(XmlObjectWrapper.class);
+            String name = ann.name(); // Get Element's name
+            sb.append(getTab(numOfTab)); // Create 1 tab
+            sb.append("<" + name + ">"); // Start Element
+            sb.append("\n"); // Add new line
+            collections = getListValueOfField(field, obj);
+
+            if (collections != null && !collections.isEmpty()) {
+                // Create xml sub elements
+                for (Object collection : collections) {
+                    sb.append(createXmlObject(collection, numOfTab + 1)); // Increase tab
+                    sb.append("\n"); // Add new line
+                }
+            }
+            sb.append(getTab(numOfTab)); // Create 1 tab
+            sb.append("</" + name + ">"); // End Element
+            sb.append("\n"); // Add new line
+        }
+        else{
+            collections = (Collection<?>) obj;
+            if (collections != null && !collections.isEmpty()) {
+                // Create xml sub elements
+                for (Object collection : collections) {
+                    sb.append(createXmlObject(collection, numOfTab)); // Increase tab
+                    sb.append("\n"); // Add new line
+                }
             }
         }
-        sb.append(getTab(numOfTab)); // Create 1 tab
-        sb.append("</" + name + ">"); // End Element
-        sb.append("\n"); // Add new line
         return sb.toString();
     }
 

@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.FIELD })
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-public @interface XmlElementWrapper {
+public @interface XmlObjectWrapper {
 
     String name();
 

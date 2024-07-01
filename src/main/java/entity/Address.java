@@ -2,8 +2,7 @@ package entity;
 
 import org.json.simple.JSONObject;
 import xml.XmlElement;
-import xml.XmlElementWrapper;
-import xml.XmlObjectElement;
+import xml.XmlObject;
 import xml.XmlRootElement;
 
 @XmlRootElement(name = "address")
@@ -16,7 +15,7 @@ public class Address {
     private String city;
     @XmlElement(name = "zipcode")
     private String zipcode;
-    @XmlObjectElement(name = "geo")
+    @XmlObject(name = "geo")
     private Geo geo;
 
     public Address(String street, String suite, String city, String zipcode, JSONObject geo) {

@@ -39,9 +39,8 @@ public class JSONConvertToXML {
                     (String) jsonObject.get("website"), (JSONObject) jsonObject.get("company")));
         }
 
-        for(User user : userList){
-            System.out.println(ObjectToXmlHelper.convertToXml(user));
-        }
+        //print out result
+        System.out.println(ObjectToXmlHelper.convertToXml(userList));
     }
 
 }

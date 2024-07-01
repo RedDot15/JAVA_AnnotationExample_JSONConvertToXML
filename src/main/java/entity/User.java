@@ -2,8 +2,7 @@ package entity;
 
 import org.json.simple.JSONObject;
 import xml.XmlElement;
-import xml.XmlElementWrapper;
-import xml.XmlObjectElement;
+import xml.XmlObject;
 import xml.XmlRootElement;
 
 @XmlRootElement(name = "user")
@@ -16,13 +15,13 @@ public class User {
     private String username;
     @XmlElement(name = "email")
     private String email;
-    @XmlObjectElement(name = "address")
+    @XmlObject(name = "address")
     private Address address;
     @XmlElement(name = "phone")
     private String phone;
     @XmlElement(name = "website")
     private String website;
-    @XmlObjectElement(name = "company")
+    @XmlObject(name = "company")
     private Company company;
 
     public User(Long id, String name, String username, String email, JSONObject address, String phone, String website, JSONObject company) {
